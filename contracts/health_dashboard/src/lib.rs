@@ -1,4 +1,5 @@
 #![no_std]
+#![allow(clippy::too_many_arguments)]
 
 use soroban_sdk::{
     contract, contractimpl, contracttype, token, Address, Env, IntoVal, Map, Symbol, Vec,
@@ -126,8 +127,10 @@ impl HealthDashboardContract {
     /// cross-contract work within the same ledger.
     pub fn get_platform_stats(env: Env) -> PlatformStats {
         let ledger = env.ledger().sequence();
-        if let Some((cached_ledger, stats)) =
-            env.storage().persistent().get::<_, (u32, PlatformStats)>(&DataKey::Cache)
+        if let Some((cached_ledger, stats)) = env
+            .storage()
+            .persistent()
+            .get::<_, (u32, PlatformStats)>(&DataKey::Cache)
         {
             if cached_ledger == ledger {
                 return stats;

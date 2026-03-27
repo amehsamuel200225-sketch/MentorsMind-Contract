@@ -1,13 +1,5 @@
 #![no_std]
-use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, BytesN, Env, Symbol};
-
-#[contracttype]
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub enum DataKey {
-    Admin,
-    Verification(Address),
-    Tier(Address),
-}
+use soroban_sdk::{contract, contractimpl, contracttype, Address, BytesN, Env, Symbol};
 
 #[contracttype]
 #[derive(Clone, Debug)]
@@ -40,26 +32,11 @@ pub enum DataKey {
     Tier(Address),
 }
 
-#[contracttype]
-#[derive(Clone)]
-pub enum DataKey {
-    Admin,
-    Verification(Address),
-    Tier(Address),
-}
-
 #[contract]
 pub struct VerificationContract;
 
 #[contractimpl]
 impl VerificationContract {
-    /// Initialize the verification contract with an admin.
-    ///
-    /// Auth: No authorization required for initialization.
-    /// Can only be called once.
-    ///
-    /// Panics if:
-    /// - Contract is already initialized
     pub fn initialize(env: Env, admin: Address) {
         if env.storage().persistent().has(&DataKey::Admin) {
             panic!("Already initialized");
@@ -67,15 +44,6 @@ impl VerificationContract {
         env.storage().persistent().set(&DataKey::Admin, &admin);
     }
 
-    /// Verify a mentor with credentials (admin only).
-    ///
-    /// Auth: Only the admin can verify mentors.
-    /// The admin address is retrieved from persistent storage.
-    ///
-    /// Panics if:
-    /// - Contract is not initialized
-    /// - Caller is not the admin
-    /// - Caller fails authorization check
     pub fn verify_mentor(env: Env, mentor: Address, credential_hash: BytesN<32>, expiry: u64) {
         let admin: Address = env
             .storage()
@@ -97,7 +65,11 @@ impl VerificationContract {
             env.storage().persistent().set(&tkey, &0i32);
         }
         env.events().publish(
-            (symbol_short!("Verify"), symbol_short!("VrfyOk"), mentor.clone()),
+            (
+                Symbol::new(&env, "Verification"),
+                Symbol::new(&env, "Verified"),
+                mentor.clone(),
+            ),
             MentorVerifiedEventData {
                 credential_hash: rec.credential_hash.clone(),
                 verified_at: rec.verified_at,
@@ -106,16 +78,6 @@ impl VerificationContract {
         );
     }
 
-    /// Revoke a mentor's verification (admin only).
-    ///
-    /// Auth: Only the admin can revoke verifications.
-    /// The admin address is retrieved from persistent storage.
-    ///
-    /// Panics if:
-    /// - Contract is not initialized
-    /// - Caller is not the admin
-    /// - Caller fails authorization check
-    /// - Mentor is not verified
     pub fn revoke_verification(env: Env, mentor: Address) {
         let admin: Address = env
             .storage()
@@ -129,7 +91,11 @@ impl VerificationContract {
         rec.is_active = false;
         env.storage().persistent().set(&key, &rec);
         env.events().publish(
-            (symbol_short!("Verify"), symbol_short!("Revoke"), mentor.clone()),
+            (
+                Symbol::new(&env, "Verification"),
+                Symbol::new(&env, "Revoked"),
+                mentor.clone(),
+            ),
             VerificationRevokedEventData { revoked: true },
         );
     }

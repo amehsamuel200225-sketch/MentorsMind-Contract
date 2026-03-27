@@ -54,8 +54,7 @@ impl Sanctions {
             env.storage()
                 .persistent()
                 .set(&DataKey::Sanctioned(hash.clone()), &true);
-            env.events()
-                .publish((symbol_short!("addr_add"),), hash);
+            env.events().publish((symbol_short!("addr_add"),), hash);
         }
     }
 

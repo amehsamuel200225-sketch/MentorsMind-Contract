@@ -37,8 +37,7 @@ impl RegulatoryReporting {
             panic!("already initialized");
         }
         env.storage().persistent().set(&DataKey::Admin, &admin);
-        env
-            .storage()
+        env.storage()
             .persistent()
             .set(&DataKey::EscrowContract, &escrow_contract);
     }
@@ -84,10 +83,8 @@ impl RegulatoryReporting {
         );
 
         if large_transaction {
-            env.events().publish(
-                (symbol_short!("large_tx"), sender),
-                (receiver, amount_usd),
-            );
+            env.events()
+                .publish((symbol_short!("large_tx"), sender), (receiver, amount_usd));
         }
     }
 
@@ -102,12 +99,7 @@ impl RegulatoryReporting {
     }
 
     /// All large transactions for a user in a given year/month.
-    pub fn get_large_transactions(
-        env: Env,
-        user: Address,
-        year: u32,
-        month: u32,
-    ) -> Vec<TxRecord> {
+    pub fn get_large_transactions(env: Env, user: Address, year: u32, month: u32) -> Vec<TxRecord> {
         let records = load_records(&env, &user);
         let mut out: Vec<TxRecord> = vec![&env];
         for r in records.iter() {

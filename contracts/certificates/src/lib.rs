@@ -102,7 +102,9 @@ impl Certificates {
             .get(&DataKey::Cert(cert_id))
             .expect("cert not found");
         cert.revoked = true;
-        env.storage().persistent().set(&DataKey::Cert(cert_id), &cert);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Cert(cert_id), &cert);
 
         env.events()
             .publish((symbol_short!("cert_rev"), cert.learner), cert_id);

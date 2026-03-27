@@ -180,8 +180,14 @@ impl StakingContract {
             env.storage().persistent().set(&DataKey::Stakers, &stakers);
         }
 
-        let total_staked: i128 = env.storage().persistent().get(&DataKey::TotalStaked).unwrap_or(0);
-        env.storage().persistent().set(&DataKey::TotalStaked, &(total_staked + amount));
+        let total_staked: i128 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::TotalStaked)
+            .unwrap_or(0);
+        env.storage()
+            .persistent()
+            .set(&DataKey::TotalStaked, &(total_staked + amount));
 
         env.events().publish(
             (
@@ -248,8 +254,14 @@ impl StakingContract {
             env.storage().persistent().set(&DataKey::Stakers, &stakers);
         }
 
-        let total_staked: i128 = env.storage().persistent().get(&DataKey::TotalStaked).unwrap_or(0);
-        env.storage().persistent().set(&DataKey::TotalStaked, &(total_staked - record.amount));
+        let total_staked: i128 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::TotalStaked)
+            .unwrap_or(0);
+        env.storage()
+            .persistent()
+            .set(&DataKey::TotalStaked, &(total_staked - record.amount));
 
         env.events().publish(
             (
@@ -294,7 +306,10 @@ impl StakingContract {
 
     /// Return the total amount staked in the contract.
     pub fn get_total_staked(env: Env) -> i128 {
-        env.storage().persistent().get(&DataKey::TotalStaked).unwrap_or(0)
+        env.storage()
+            .persistent()
+            .get(&DataKey::TotalStaked)
+            .unwrap_or(0)
     }
 }
 
